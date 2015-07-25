@@ -6,13 +6,15 @@
 
 QT += core gui widgets
 
-TARGET = SystemMonitor
+TARGET = CookiesManager
 
 TEMPLATE = app
 
 SOURCES += main.cpp \
-    systemmonitor.cpp
+    cookiesmanager.cpp
 
-HEADERS += systemmonitor.h
+HEADERS += cookiesmanager.h
 
-RC_FILE = res.rc
+RESOURCES += img.qrc
+
+win32:RC_FILE = res.rc

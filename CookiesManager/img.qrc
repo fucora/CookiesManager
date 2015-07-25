@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/">
+        <file>img/collapse.png</file>
+        <file>img/expand.png</file>
+        <file>img/http.png</file>
+        <file>img/new.png</file>
+        <file>img/record.png</file>
+        <file>img/secure.png</file>
+        <file>img/session.png</file>
+        <file>img/settings.png</file>
+    </qresource>
+</RCC>
