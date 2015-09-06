@@ -1,0 +1,25 @@
+Manage cookies in Mozilla Firefox with functions such as add, clear, auto clear, edit and autorestore after startup.
+
+Create cookies.cfg in firefox profile folder (default stores in %APPDATA%\Mozilla\Firefox\Profiles\<profile_name>).
+CookiesManager uses only to create configuration file. It file contains groupname (begins with #) and rows. Rows contains Host, IsHttpOnly flag, path, IsSecure flag, expire date, name and value. The first group is obligatory (may be empty) - it favorite group.
+
+Add settings to Firefox in about:config:
+usersettings.cm.apppath (string) - full path to executable file of CookiesManager (e.g. "C:\App\CookiesManager64.exe");
+usersettings.cm.timer.enabled (boolean) - auto clear cookies is enabled (default false);
+usersettings.cm.timer.interval (integer) - auto clear interval in milliseconds (default 300000).
+
+Open ForFirefox folder;
+Install CustomButtons addon (https://addons.mozilla.org/en-US/firefox/addon/custom-buttons/)
+Add new button - copy-paste ButtonCode.txt to addressbar, move icon to bar in customize settings.
+
+Icon actions:
+Left-click - show all cookies in tab;
+Middle-click - clear cookies (without cookies in favorite group);
+Right-click - choose group for add cookies (remove all previous cookies for the host, said in a cookie);
+Ctrl-click - toggle auto clear cookies (without cookies in favorite group and currently open sites in tabs);
+Shift-click - open CookiesManager for current profile.
+
+After startup all cookies is removed without favorite group.
+
+Run parameters:
+[%filepath%] - open configuration file.
