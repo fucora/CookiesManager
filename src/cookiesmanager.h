@@ -22,6 +22,10 @@
 #include <QtCore/QTimer>
 #include <QtCore/QTranslator>
 
+#ifdef __MINGW32__
+#pragma GCC diagnostic warning "-Wpedantic"
+#endif
+
 class DateTimeEditEx : public QDateTimeEdit
 {
     //Q_OBJECT not required

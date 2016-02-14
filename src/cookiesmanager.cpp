@@ -154,10 +154,9 @@ CookiesManager::CookiesManager() : QWidget(),
 {
     Q_ASSERT(sizeof(qint64) == sizeof(qlonglong));
 
-    const QString strAppName = qAppName(),
-            strAppDir = qApp->applicationDirPath();
+    const QString strAppPath = qApp->applicationFilePath();
     QTranslator *translator = new QTranslator(this);
-    if (translator->load(strAppName, strAppDir) || translator->load(strAppName + '_' + QLocale::system().name(), strAppDir))
+    if (translator->load(strAppPath + ".qm"))
         qApp->installTranslator(translator);
 
     QPushButton *pbNewCfg = new QPushButton(QIcon(":/img/new.png"), 0, this);
@@ -222,7 +221,7 @@ CookiesManager::CookiesManager() : QWidget(),
                                           << tr("Name")
                                           << tr("Value"));
     itemSelModel = trViewEx->selectionModel();
-    this->setWindowTitle(strAppName + " [?]");
+    this->setWindowTitle(qAppName() + " [?]");
 
     //connects
     connect(pbNewCfg, SIGNAL(clicked()), this, SLOT(slotNewCfg()));
@@ -240,7 +239,7 @@ CookiesManager::CookiesManager() : QWidget(),
     connect(trViewEx, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(slotEdit(QModelIndex)));
 
     //settings
-    QSettings stgIni(strAppDir + '/' + strAppName + ".ini", QSettings::IniFormat);
+    QSettings stgIni(strAppPath + ".ini", QSettings::IniFormat);
     if (stgIni.childGroups().contains("Settings"))
     {
         stgIni.beginGroup("Settings");
@@ -258,16 +257,24 @@ CookiesManager::CookiesManager() : QWidget(),
         stgIni.endGroup();
     }
 
-    const QSettings stg("UserPrograms", strAppName);
-    if (this->restoreGeometry(stg.value("Geometry").toByteArray()))
+    QFile file(strAppPath + ".geo");
+    if (file.size() == 50 && file.open(QIODevice::ReadOnly))
     {
-        const QStringList slistSizes = stg.value("SizesOfColumns").toString().split('|');
-        if (slistSizes.size() == eHeaderValue)
+        const QByteArray baGeo = file.readAll();
+        if (!file.error())
+            this->restoreGeometry(baGeo);
+        file.close();
+    }
+    file.setFileName(strAppPath + ".sta");
+    if (file.size() <= 100 && file.open(QIODevice::ReadOnly))
+    {
+        const QList<QByteArray> list = file.readAll().split('|');
+        if (list.size() == eHeaderValue)
         {
             QHeaderView *headerView = trViewEx->header();
             for (int i = eHeaderHost; i < eHeaderValue; ++i)
             {
-                const int iSizeColumn = slistSizes.at(i).toInt();
+                const int iSizeColumn = list.at(i).toInt();
                 if (iSizeColumn > 0)
                     headerView->resizeSection(i, iSizeColumn);
             }
@@ -284,13 +291,21 @@ CookiesManager::CookiesManager() : QWidget(),
 CookiesManager::~CookiesManager()
 {
     const QHeaderView *headerView = trViewEx->header();
-    QString strSizes;
+    QByteArray baSizes;
     for (int i = eHeaderHost; i < eHeaderValue; ++i)
-        strSizes += QString::number(headerView->sectionSize(i)) + '|';
-    strSizes.chop(1);
-    QSettings stg("UserPrograms", qAppName());
-    stg.setValue("SizesOfColumns", strSizes);
-    stg.setValue("Geometry", this->saveGeometry());
+        baSizes += QByteArray::number(headerView->sectionSize(i)) + '|';
+    baSizes.chop(1);
+
+    const QString strPath = qApp->applicationFilePath();
+    QFile file(strPath + ".geo");
+    if (file.open(QIODevice::WriteOnly))
+    {
+        file.write(this->saveGeometry());
+        file.close();
+    }
+    file.setFileName(strPath + ".sta");
+    if (file.open(QIODevice::WriteOnly))
+        file.write(baSizes);
 }
 
 //-------------------------------------------------------------------------------------------------
